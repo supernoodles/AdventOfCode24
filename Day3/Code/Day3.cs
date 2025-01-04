@@ -9,8 +9,6 @@ public partial class Day3
 
     public int Part1(string input)
     {
-        //var regex = new Regex(@"mul\(?<\d{1,3}>,?<\d{1,3}>\)");
-
         var matches = MulRegex().Matches(input);
 
         var total = 0;
@@ -22,5 +20,10 @@ public partial class Day3
         }
 
         return total;
+    }
+
+    public int Part2(string input)
+    {
+        return 0;
     }
 }
