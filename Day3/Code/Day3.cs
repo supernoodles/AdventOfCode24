@@ -1,9 +1,26 @@
 namespace Code;
 
-public class Day3
+using System.Text.RegularExpressions;
+
+public partial class Day3
 {
-    public int Part1(string[] input)
+    [GeneratedRegex(@"mul\((?<a>\d{1,3}),(?<b>\d{1,3})\)", RegexOptions.IgnoreCase)]
+    private static partial Regex MulRegex();
+
+    public int Part1(string input)
     {
-        return 0;
+        //var regex = new Regex(@"mul\(?<\d{1,3}>,?<\d{1,3}>\)");
+
+        var matches = MulRegex().Matches(input);
+
+        var total = 0;
+
+        foreach (Match match in matches)
+        {
+            //Console.WriteLine(match.Groups[0]);
+            total += int.Parse(match.Groups["a"].Value) * int.Parse(match.Groups["b"].Value);
+        }
+
+        return total;
     }
 }

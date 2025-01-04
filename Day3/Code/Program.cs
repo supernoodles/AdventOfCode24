@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, Day3!");
 
-var input = File.ReadAllLines("input.txt");
+var input = File.ReadAllText("input.txt");
 
 var day3 = new Code.Day3();
 
