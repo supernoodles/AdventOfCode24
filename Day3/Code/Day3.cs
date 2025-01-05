@@ -7,23 +7,36 @@ public partial class Day3
     [GeneratedRegex(@"mul\((?<a>\d{1,3}),(?<b>\d{1,3})\)", RegexOptions.IgnoreCase)]
     private static partial Regex MulRegex();
 
-    public int Part1(string input)
+    [GeneratedRegex(@"(?<i>do)\(\)|(?<i>don't)\(\)|(?<i>mul)\((?<a>\d{1,3}),(?<b>\d{1,3})\)", RegexOptions.IgnoreCase)]
+    private static partial Regex Combined();
+
+    public static int Part1(string input) =>
+        MulRegex().Matches(input)
+            .Cast<Match>()
+            .Sum(_ => int.Parse(_.Groups["a"].Value) * int.Parse(_.Groups["b"].Value));
+
+    public static int Part2(string input)
     {
-        var matches = MulRegex().Matches(input);
+        bool include = true;
 
-        var total = 0;
+        return Combined().Matches(input).Cast<Match>()
+            .Sum(item => {
+                if(include && item.Groups["i"].Value == "mul")
+                {
+                    return int.Parse(item.Groups["a"].Value) * int.Parse(item.Groups["b"].Value);
+                }
 
-        foreach (Match match in matches)
-        {
-            //Console.WriteLine(match.Groups[0]);
-            total += int.Parse(match.Groups["a"].Value) * int.Parse(match.Groups["b"].Value);
-        }
+                if(item.Groups["i"].Value == "do")
+                {
+                    include = true;
+                }
 
-        return total;
-    }
+                if(item.Groups["i"].Value == "don't")
+                {
+                    include = false;
+                }
 
-    public int Part2(string input)
-    {
-        return 0;
+                return 0;
+            });
     }
 }
