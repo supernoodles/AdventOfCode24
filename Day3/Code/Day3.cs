@@ -15,28 +15,26 @@ public partial class Day3
             .Cast<Match>()
             .Sum(_ => int.Parse(_.Groups["a"].Value) * int.Parse(_.Groups["b"].Value));
 
-    public static int Part2(string input)
-    {
-        bool include = true;
-
-        return Combined().Matches(input).Cast<Match>()
-            .Sum(item => {
-                if(include && item.Groups["i"].Value == "mul")
+    public static int Part2(string input) =>
+        Combined().Matches(input).Cast<Match>()
+            .Aggregate((Total: 0, Include: true), (a, item) => 
+            {
+                if(a.Include && item.Groups["i"].Value == "mul")
                 {
-                    return int.Parse(item.Groups["a"].Value) * int.Parse(item.Groups["b"].Value);
+                    a.Total += int.Parse(item.Groups["a"].Value) * int.Parse(item.Groups["b"].Value);
                 }
 
                 if(item.Groups["i"].Value == "do")
                 {
-                    include = true;
+                    a.Include = true;
                 }
 
                 if(item.Groups["i"].Value == "don't")
                 {
-                    include = false;
+                    a.Include = false;
                 }
 
-                return 0;
-            });
-    }
+                return a;
+            })
+            .Total;
 }
