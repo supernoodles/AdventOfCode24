@@ -18,23 +18,13 @@ public partial class Day3
     public static int Part2(string input) =>
         Combined().Matches(input).Cast<Match>()
             .Aggregate((Total: 0, Include: true), (a, item) => 
-            {
-                if(a.Include && item.Groups["i"].Value == "mul")
+                item.Groups["i"].Value switch
                 {
-                    a.Total += int.Parse(item.Groups["a"].Value) * int.Parse(item.Groups["b"].Value);
+                    "do"    => (a.Total, true),
+                    "don't" => (a.Total, false),
+                    "mul"   => (a.Include ? a.Total + int.Parse(item.Groups["a"].Value) * int.Parse(item.Groups["b"].Value) : a.Total, a.Include),
+                    _ => a
                 }
-
-                if(item.Groups["i"].Value == "do")
-                {
-                    a.Include = true;
-                }
-
-                if(item.Groups["i"].Value == "don't")
-                {
-                    a.Include = false;
-                }
-
-                return a;
-            })
+            )
             .Total;
 }
