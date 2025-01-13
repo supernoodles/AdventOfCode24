@@ -34,6 +34,6 @@ public class Part2Tests
         M.S
         """;
 
-        Assert.Equal(1, day4.Part1(input.Split("\n")));
+        Assert.Equal(1, day4.Part2(input.Split("\n")));
     }
 }

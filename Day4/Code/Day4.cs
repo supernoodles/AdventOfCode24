@@ -26,21 +26,26 @@ public class Day4
         var rows = input.Length;
 
         return 
-            Enumerable.Range(0, rows)
+            Enumerable.Range(1, rows - 2)
                 .SelectMany(row =>
-                    Enumerable.Range(0, cols)
+                    Enumerable.Range(1, cols - 2)
                         .Select(col =>
                             input[row][col] == 'A'
-                                ? CheckXmas2(input, row, col)
-                                : 0    
+                                && CheckXmas2(input, row, col)
                     )
                 )
-                .Sum();
+                .Count(_ => _);
     }
 
-    private int CheckXmas2(string[] input, int row, int col)
+    private bool CheckXmas2(string[] input, int row, int col)
     {
-        return 0;
+        var tl = input[row-1][col-1];
+        var bl = input[row+1][col-1];
+        var tr = input[row-1][col+1];
+        var br = input[row+1][col+1];
+
+        return ((tl=='M' && br=='S') || (tl=='S' && br=='M'))
+            && ((bl=='M' && tr=='S') || (bl=='S' && tr=='M'));
     }
 
     private int CheckXmas(string[] input, int row, int col)
