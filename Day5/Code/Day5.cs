@@ -18,35 +18,29 @@ public class Day5
     {
         var (orderingRules, pageOrders) = Parse(input);
 
-        var middle = 0;
-
-        foreach (var order in pageOrders)
-        {
-            if (isCorrect(order))
+        return pageOrders
+            .Where(order => !isCorrect(order))
+            .Select(order =>
             {
-                continue;
-            }
+                var wrong = true;
 
-            var wrong = true;
-
-            while (wrong)
-            {
-                wrong = false;
-
-                for (int i = 0; i < order.Count - 1; ++i)
+                while (wrong)
                 {
-                    if (!orderingRules.TryGetValue(order[i], out _) || !orderingRules[order[i]].Contains(order[i + 1]))
+                    wrong = false;
+
+                    for (int i = 0; i < order.Count - 1; ++i)
                     {
-                        (order[i + 1], order[i]) = (order[i], order[i + 1]);
-                        wrong = true;
+                        if (!orderingRules.TryGetValue(order[i], out _) || !orderingRules[order[i]].Contains(order[i + 1]))
+                        {
+                            (order[i + 1], order[i]) = (order[i], order[i + 1]);
+                            wrong = true;
+                        }
                     }
                 }
-            }
-
-            middle += int.Parse(order[order.Count / 2]);
-        }
-
-        return middle;
+                
+                return int.Parse(order[order.Count / 2]);
+            })
+            .Sum();
 
         bool isCorrect(List<string> pageOrder) =>
             Enumerable.Range(0, pageOrder.Count - 1)
