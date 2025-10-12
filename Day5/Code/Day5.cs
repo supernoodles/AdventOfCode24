@@ -32,27 +32,10 @@ public class Day5
             }
         }
 
-        var middle = 0;
-
-        foreach (var order in pageOrders)
-        {
-            bool isValid = true;
-
-            for (int i = 0; i < order.Count - 1; ++i)
-            {
-                for (int j = i + 1; j < order.Count; ++j)
-                {
-                    if (!orderingRules.TryGetValue(order[i], out _) || !orderingRules[order[i]].Contains(order[j]))
-                    {
-                        isValid = false;
-                        continue;
-                    }
-                }
-            }
-
-            middle += isValid ? int.Parse(order[order.Count / 2]) : 0;
-        }
-
-        return middle;
+        return pageOrders.Select(order => Enumerable.Range(0, order.Count - 1)
+                .All(i => orderingRules.TryGetValue(order[i], out _) && orderingRules[order[i]].Contains(order[i + 1]))
+                    ? int.Parse(order[order.Count / 2])
+                    : 0)
+                .Sum();
     }
 }
