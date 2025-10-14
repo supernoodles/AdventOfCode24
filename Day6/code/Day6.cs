@@ -13,27 +13,40 @@ public class Day6
         var velX = 0;
         var velY = -1;
 
+        var distinctPos = 0;
+
         while (guardInBounds(map, guardX, guardY))
         {
-            var next = map[guardY + velY][guardX + velX];
+            var nextX = guardX + velX;
+            var nextY = guardY + velY;
 
-            if (next == '.')
+            if (!guardInBounds(map, nextX, nextY))
             {
-                map[guardY][guardX] = '.';
-                guardX += velX;
-                guardY += velY;
-                map[guardY][guardX] = '^';
+                map[guardY][guardX] = 'X';
+
+                guardX = nextX;
+                guardY = nextY;
+                continue;
             }
+
+            var next = map[nextY][nextX];
 
             if (next == '#')
             {
                 (velX, velY) = rotate90(velX, velY);
+                continue;
             }
+
+            map[guardY][guardX] = 'X';
+            map[nextY][nextX] = '^';
+
+            guardX = nextX;
+            guardY = nextY;
 
             PrintMap(map);
         }
 
-        return 0;
+        return map.SelectMany(row => row).Where(pos => pos == 'X').Count();
     }
 
     private bool guardInBounds(char[][] map, int guardX, int guardY) =>

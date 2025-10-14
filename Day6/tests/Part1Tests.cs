@@ -20,6 +20,6 @@ public class Part1Tests
 ......#...
 """;
 
-        Assert.Equal(0, day6.Part1(input.Split("\r\n")));
+        Assert.Equal(41, day6.Part1(input.Split("\n")));
     }
 }
