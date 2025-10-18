@@ -4,9 +4,21 @@ public class Day7
 {
     public long Part1(string[] input)
     {
-        var (testValues, testOperands) = Parse(input);
-
         List<Func<long, long, long>> operations = [(a, b) => a + b, (a, b) => a * b];
+
+        return RunCalibration(input, operations);
+    }
+
+    public long Part2(string[] input)
+    {
+        List<Func<long, long, long>> operations = [(a, b) => a + b, (a, b) => a * b, (a, b) => long.Parse($"{a}{b}")];
+
+        return RunCalibration(input, operations);
+    }
+
+    private long RunCalibration(string[] input, List<Func<long,long,long>> operations)
+    {
+        var (testValues, testOperands) = Parse(input);
 
         long total = Enumerable.Range(0, testValues.Count)
             .Select(index =>
@@ -21,10 +33,10 @@ public class Day7
             })
             .Sum();
 
-        return total;
+        return total;        
     }
 
-    private void Recurse(List<long> results, List<int> operands, int index, long total, List<Func<long,long,long>> operations)
+    private void Recurse(List<long> results, List<int> operands, int index, long total, List<Func<long, long, long>> operations)
     {
         if (index == operands.Count)
         {

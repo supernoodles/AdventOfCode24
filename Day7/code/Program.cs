@@ -6,3 +6,5 @@ var input = File.ReadAllLines("input.txt");
 var day7 = new code.Day7();
 
 Console.WriteLine($"Part1 = {day7.Part1(input)}");
+
+Console.WriteLine($"Part2 = {day7.Part2(input)}");
