@@ -1,6 +1,4 @@
 using System.Data;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace code;
 
@@ -33,9 +31,7 @@ public class Day6
             {
                 map[guardY][guardX] = 'X';
 
-                guardX = nextX;
-                guardY = nextY;
-                continue;
+                break;
             }
 
             var next = map[nextY][nextX];
@@ -51,8 +47,6 @@ public class Day6
 
             guardX = nextX;
             guardY = nextY;
-
-            //PrintMap(map);
         }
     }
 
@@ -66,11 +60,11 @@ public class Day6
 
         var (guardInitVelX, guardInitVelY) = (0, -1);
 
-        PrintMap(guardMap);
-
         FindGuardRoute(guardMap);
 
         var guardDefault = new Guard(-1, -1, -1, -1);
+
+        HashSet<Guard> guardPath = [];
 
         var guardLoop = 0;
 
@@ -78,17 +72,16 @@ public class Day6
         {
             for (int iY = 0; iY < guardMap.Length; ++iY)
             {
-                Guard oGuard = guardDefault;
-
                 if (guardMap[iY][iX] != 'X')
                 {
                     continue;
                 }
 
+                guardPath.Clear();
+
                 char[][] map = [.. input.Select(s => s.ToCharArray())];
 
-                // map[iY][iX] = 'O';
-                map[30][9] = 'O';
+                map[iY][iX] = 'O';
 
                 var (guardX, guardY, velX, velY) = (guardInitX, guardInitY, guardInitVelX, guardInitVelY);
 
@@ -99,10 +92,7 @@ public class Day6
 
                     if (!GuardInBounds(map, nextX, nextY))
                     {
-                        guardX = nextX;
-                        guardY = nextY;
-
-                        continue;
+                        break;
                     }
 
                     var next = map[nextY][nextX];
@@ -111,22 +101,7 @@ public class Day6
                     {
                         (velX, velY) = Rotate90(velX, velY);
 
-                        if (next == '#')
-                        {
-                            continue;
-                        }
-
-                        if (oGuard == guardDefault)
-                        {
-                            oGuard = new Guard(guardX, guardY, velX, velY);
-                            continue;
-                        }
-
-                        if (oGuard == new Guard(guardX, guardY, velX, velY))
-                        {
-                            guardLoop += 1;
-                            break;
-                        }
+                        continue;
                     }
 
                     map[guardY][guardX] = 'X';
@@ -135,11 +110,15 @@ public class Day6
                     guardX = nextX;
                     guardY = nextY;
 
-                    PrintMap(map);
+                    var currentGuardState = new Guard(guardX, guardY, velX, velY);
 
+                    if (guardPath.Contains(currentGuardState))
+                    {
+                        ++guardLoop;
+                        break;
+                    }
 
-                    Thread.Sleep(100);
-                    //Console.ReadLine();
+                    guardPath.Add(currentGuardState);
                 }
             }
         }
