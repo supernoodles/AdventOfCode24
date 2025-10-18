@@ -1,5 +1,3 @@
-using System.Data;
-
 namespace code;
 
 public class Day6
@@ -61,8 +59,6 @@ public class Day6
         var (guardInitVelX, guardInitVelY) = (0, -1);
 
         FindGuardRoute(guardMap);
-
-        var guardDefault = new Guard(-1, -1, -1, -1);
 
         HashSet<Guard> guardPath = [];
 
