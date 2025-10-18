@@ -1,2 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Hello, Day 7");
+
+var input = File.ReadAllLines("input.txt");
+
+var day7 = new code.Day7();
+
+Console.WriteLine($"Part1 = {day7.Part1(input)}");

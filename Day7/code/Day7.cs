@@ -2,16 +2,16 @@ namespace code;
 
 public class Day7
 {
-    public int Part1(string[] input)
+    public long Part1(string[] input)
     {
         var (testValues, testOperands) = Parse(input);
 
-        List<Func<int, int, int>> operations = [(a, b) => a + b, (a, b) => a * b];
+        List<Func<long, long, long>> operations = [(a, b) => a + b, (a, b) => a * b];
 
-        int total = Enumerable.Range(0, testValues.Count)
+        long total = Enumerable.Range(0, testValues.Count)
             .Select(index =>
             {
-                List<int> results = [];
+                List<long> results = [];
 
                 Recurse(results, testOperands[index], 1, testOperands[index][0], operations);
 
@@ -24,7 +24,7 @@ public class Day7
         return total;
     }
 
-    private void Recurse(List<int> results, List<int> operands, int index, int total, List<Func<int, int, int>> operations)
+    private void Recurse(List<long> results, List<int> operands, int index, long total, List<Func<long,long,long>> operations)
     {
         if (index == operands.Count)
         {
@@ -39,9 +39,9 @@ public class Day7
         }
     }
 
-    private (List<int> testValues, List<List<int>> testOperands) Parse(string[] input)
+    private (List<long> testValues, List<List<int>> testOperands) Parse(string[] input)
     {
-        List<int> testValues = [];
+        List<long> testValues = [];
         List<List<int>> testOperands = [];
 
         var stringSplitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
@@ -51,7 +51,7 @@ public class Day7
             .ForEach(line =>
             {
                 var parts = line.Split(':', stringSplitOptions);
-                testValues.Add(int.Parse(parts[0]));
+                testValues.Add(long.Parse(parts[0]));
                 testOperands.Add([.. parts[1].Split(" ", stringSplitOptions).Select(part => int.Parse(part))]);
             });
 
