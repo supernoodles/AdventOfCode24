@@ -16,16 +16,16 @@ public class Day7
         return RunCalibration(input, operations);
     }
 
-    private long RunCalibration(string[] input, List<Func<long,long,long>> operations)
+    private long RunCalibration(string[] input, List<Func<long, long, long>> operations)
     {
         var (testValues, testOperands) = Parse(input);
 
-        long total = Enumerable.Range(0, testValues.Count)
-            .Select(index =>
+        long total = testOperands
+            .Select((operands, index) =>
             {
                 List<long> results = [];
 
-                Recurse(results, testOperands[index], 1, testOperands[index][0], operations);
+                Recurse(results, operands, 1, operands[0], operations);
 
                 return results.Any(result => result == testValues[index])
                     ? testValues[index]
@@ -33,7 +33,7 @@ public class Day7
             })
             .Sum();
 
-        return total;        
+        return total;
     }
 
     private void Recurse(List<long> results, List<int> operands, int index, long total, List<Func<long, long, long>> operations)
