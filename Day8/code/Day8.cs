@@ -1,12 +1,9 @@
-using System.Security.Cryptography.X509Certificates;
-
 namespace code;
 
 public record Location(int X, int Y);
 
 public class Day8
 {
-
     public List<Location> Part1(string[] input)
     {
         var width = input[0].Length;
@@ -14,24 +11,53 @@ public class Day8
 
         char[] map = [.. input.SelectMany(row => row.ToArray())];
 
-        var antennas = map.Where(_ => _ != '.' && _ != '#').Distinct().ToList();
+        var antennaFrequencies = map.Where(_ => _ != '.' && _ != '#').Distinct().ToList();
 
-        var antenna = antennas.First();
+        List<Location> antinodes = [];
 
-        var locations = map.Index().Where(location => location.Item == antenna).Select(_ => _.Index).ToList();
+        foreach (var antennaFrequency in antennaFrequencies)
+        {
+            var antennaLocations = map
+                .Index()
+                .Where(location => location.Item == antennaFrequency)
+                .Select(_ => _.Index).ToList();
 
-        var dx = locations[1] % width - locations[0] % width;
-        var dy = locations[1] / height - locations[0] / height;
+            var antennaPairs = antennaLocations
+                .SelectMany(item =>
+                    antennaLocations.Select(item2 =>
+                        item2 != item
+                            ? item < item2
+                                ? new { First = item, Second = item2 }
+                                : new { First = item2, Second = item }
+                            : null))
+                .Where(_ => _ != null)
+                .Distinct()
+                .ToList();
 
-        var p1x = (locations[1] % 10) + dx;
-        var p1y = (locations[1] / 10) + dy;
+            foreach (var pair in antennaPairs)
+            {
+                var dx = pair!.Second % width - pair.First % width;
+                var dy = pair.Second / height - pair.First / height;
 
-        var p2x = (locations[0] % 10) - dx;
-        var p2y = (locations[0] / 10) - dy;
+                var p1x = (pair.Second % width) + dx;
+                var p1y = (pair.Second / height) + dy;
 
-        return [
-            new Location(p1x, p1y),
-            new Location(p2x, p2y)
-        ];
+                var p2x = (pair.First % width) - dx;
+                var p2y = (pair.First / height) - dy;
+
+                StoreAntiNodeOnMap(width, height, antinodes, p1x, p1y);
+                StoreAntiNodeOnMap(width, height, antinodes, p2x, p2y);
+            }
+        }
+
+        return [.. antinodes.Distinct()];
+    }
+
+    private static void StoreAntiNodeOnMap(int width, int height, List<Location> antinodes, int x, int y)
+    {
+        if (x >= 0 && x < width && y >= 0 && y < height)
+        {
+            antinodes.Add(new Location(x, y));
+        }
     }
 }
