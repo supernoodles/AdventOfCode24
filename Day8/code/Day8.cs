@@ -4,6 +4,8 @@ public record Location(int X, int Y);
 
 public class Day8
 {
+    private record LocationPair(Location First, Location Second);
+
     public List<Location> Part1(string[] input)
     {
         var width = input[0].Length;
@@ -17,33 +19,20 @@ public class Day8
 
         foreach (var antennaFrequency in antennaFrequencies)
         {
-            var antennaLocations = map
-                .Index()
-                .Where(location => location.Item == antennaFrequency)
-                .Select(_ => _.Index).ToList();
+            List<int> antennaLocations = FindAntennaLocationsForFrequency(map, antennaFrequency);
 
-            var antennaPairs = antennaLocations
-                .SelectMany(item =>
-                    antennaLocations.Select(item2 =>
-                        item2 != item
-                            ? item < item2
-                                ? new { First = item, Second = item2 }
-                                : new { First = item2, Second = item }
-                            : null))
-                .Where(_ => _ != null)
-                .Distinct()
-                .ToList();
+            var antennaPairs = FindAntennaLocationPairs(width, height, antennaLocations);
 
             foreach (var pair in antennaPairs)
             {
-                var dx = pair!.Second % width - pair.First % width;
-                var dy = pair.Second / height - pair.First / height;
+                var dx = pair!.Second.X - pair.First.X;
+                var dy = pair.Second.Y - pair.First.Y;
 
-                var p1x = (pair.Second % width) + dx;
-                var p1y = (pair.Second / height) + dy;
+                var p1x = pair.Second.X + dx;
+                var p1y = pair.Second.Y + dy;
 
-                var p2x = (pair.First % width) - dx;
-                var p2y = (pair.First / height) - dy;
+                var p2x = pair.First.X - dx;
+                var p2y = pair.First.Y - dy;
 
                 StoreAntiNodeOnMap(width, height, antinodes, p1x, p1y);
                 StoreAntiNodeOnMap(width, height, antinodes, p2x, p2y);
@@ -66,30 +55,17 @@ public class Day8
 
         foreach (var antennaFrequency in antennaFrequencies)
         {
-            var antennaLocations = map
-                .Index()
-                .Where(location => location.Item == antennaFrequency)
-                .Select(_ => _.Index).ToList();
+            var antennaLocations = FindAntennaLocationsForFrequency(map, antennaFrequency);
 
-            var antennaPairs = antennaLocations
-                .SelectMany(item =>
-                    antennaLocations.Select(item2 =>
-                        item2 != item
-                            ? item < item2
-                                ? new { First = item, Second = item2 }
-                                : new { First = item2, Second = item }
-                            : null))
-                .Where(_ => _ != null)
-                .Distinct()
-                .ToList();
+            var antennaPairs = FindAntennaLocationPairs(width, height, antennaLocations);
 
             foreach (var pair in antennaPairs)
             {
-                var dx = pair!.Second % width - pair.First % width;
-                var dy = pair.Second / height - pair.First / height;
+                var dx = pair!.Second.X - pair.First.X;
+                var dy = pair.Second.Y - pair.First.Y;
 
-                var p1x = pair.Second % width;
-                var p1y = pair.Second / height;
+                var p1x = pair.Second.X;
+                var p1y = pair.Second.Y;
 
                 while (StoreAntiNodeOnMap(width, height, antinodes, p1x, p1y))
                 {
@@ -97,19 +73,48 @@ public class Day8
                     p1y += dy;
                 }
 
-                var p2x = pair.First % width;
-                var p2y = pair.First / height;
+                var p2x = pair.First.X;
+                var p2y = pair.First.Y;
 
                 while (StoreAntiNodeOnMap(width, height, antinodes, p2x, p2y))
                 {
                     p2x -= dx;
                     p2y -= dy;
-                }    
+                }
             }
         }
 
         return [.. antinodes.Distinct()];
     }
+
+    private static List<int> FindAntennaLocationsForFrequency(char[] map, char antennaFrequency) =>
+        [.. map
+            .Index()
+            .Where(location => location.Item == antennaFrequency)
+            .Select(_ => _.Index)];
+
+    private static Location LocationFromIndex(int index, int width, int height) =>
+        new(index % width, index / height);
+
+    private static List<LocationPair?> FindAntennaLocationPairs(int width, int height, List<int> antennaLocations) =>
+        [.. antennaLocations
+            .SelectMany(location =>
+                antennaLocations.Select(location2 =>
+                    location2 != location
+                        ? location < location2
+                            ? new LocationPair
+                            (
+                                LocationFromIndex(location, width, height),
+                                LocationFromIndex(location2, width, height)
+                            )
+                            : new LocationPair
+                            (
+                                LocationFromIndex(location2, width, height),
+                                LocationFromIndex(location, width, height)
+                            )
+                        : null))
+            .Where(_ => _ != null)
+            .Distinct()];
 
     private static bool StoreAntiNodeOnMap(int width, int height, List<Location> antinodes, int x, int y)
     {
