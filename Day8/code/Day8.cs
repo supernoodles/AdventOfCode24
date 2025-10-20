@@ -12,8 +12,7 @@ public class Day8
         var height = input.Length;
 
         char[] map = [.. input.SelectMany(row => row.ToArray())];
-
-        var antennaFrequencies = map.Where(_ => _ != '.' && _ != '#').Distinct().ToList();
+        List<char> antennaFrequencies = FindAntennaFrequenciesOnMap(map);
 
         List<Location> antinodes = [];
 
@@ -25,17 +24,15 @@ public class Day8
 
             foreach (var pair in antennaPairs)
             {
-                var dx = pair!.Second.X - pair.First.X;
-                var dy = pair.Second.Y - pair.First.Y;
+                if (pair == null)
+                {
+                    continue;
+                }
+                
+                var (dx, dy) = FindAntennaPairLocationDelta(pair);
 
-                var p1x = pair.Second.X + dx;
-                var p1y = pair.Second.Y + dy;
-
-                var p2x = pair.First.X - dx;
-                var p2y = pair.First.Y - dy;
-
-                StoreAntiNodeOnMap(width, height, antinodes, p1x, p1y);
-                StoreAntiNodeOnMap(width, height, antinodes, p2x, p2y);
+                StoreAntiNodeOnMap(width, height, antinodes, pair.Second.X + dx, pair.Second.Y + dy);
+                StoreAntiNodeOnMap(width, height, antinodes, pair.First.X - dx, pair.First.Y - dy);
             }
         }
 
@@ -49,7 +46,7 @@ public class Day8
 
         char[] map = [.. input.SelectMany(row => row.ToArray())];
 
-        var antennaFrequencies = map.Where(_ => _ != '.' && _ != '#').Distinct().ToList();
+        var antennaFrequencies = FindAntennaFrequenciesOnMap(map);
 
         List<Location> antinodes = [];
 
@@ -61,8 +58,12 @@ public class Day8
 
             foreach (var pair in antennaPairs)
             {
-                var dx = pair!.Second.X - pair.First.X;
-                var dy = pair.Second.Y - pair.First.Y;
+                if (pair == null)
+                {
+                    continue;
+                }
+
+                var (dx, dy) = FindAntennaPairLocationDelta(pair);
 
                 var p1x = pair.Second.X;
                 var p1y = pair.Second.Y;
@@ -86,6 +87,13 @@ public class Day8
 
         return [.. antinodes.Distinct()];
     }
+
+    private static (int dx, int dy) FindAntennaPairLocationDelta(LocationPair pair) =>
+        (pair.Second.X - pair.First.X,
+        pair.Second.Y - pair.First.Y);
+    
+    private static List<char> FindAntennaFrequenciesOnMap(char[] map) =>
+        [.. map.Where(_ => _ != '.' && _ != '#').Distinct()];
 
     private static List<int> FindAntennaLocationsForFrequency(char[] map, char antennaFrequency) =>
         [.. map
