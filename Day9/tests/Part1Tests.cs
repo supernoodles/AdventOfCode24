@@ -19,6 +19,8 @@ public class Part1Tests
 
         var input = "2333133121414131402";
         
+        //00...111...2...333.44.5555.6666.777.888899
+
         Assert.Equal(1928, day9.Part1(input));
     }
 }
