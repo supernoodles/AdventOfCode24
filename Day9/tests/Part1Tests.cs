@@ -9,7 +9,7 @@ public class Part1Tests
 
         var input = "12345";
 
-        Assert.Equal("0..111....22222", day9.Part1(input));
+        Assert.Equal(60, day9.Part1(input));
     }
 
     [Fact]
@@ -19,6 +19,6 @@ public class Part1Tests
 
         var input = "2333133121414131402";
         
-        Assert.Equal("00...111...2...333.44.5555.6666.777.888899", day9.Part1(input));
+        Assert.Equal(1928, day9.Part1(input));
     }
 }
