@@ -35,17 +35,15 @@ public class Day10
         return score;
     }
 
-    private readonly static List<Position> searchOffsets = [
+    private readonly static List<Position> searchOffsets =
+        [
             new Position(0, -1),
             new Position(-1, 0), new Position(1, 0),
             new Position(0, 1)
         ];
 
-    private static List<Position?> FindNextHeightPositions(char[][] map, int width, int height, int currentX, int currentY)
-    {
-        var nextHeight = map[currentY][currentX] + 1;
-
-        return [.. searchOffsets.Select(offset =>
+    private static List<Position?> FindNextHeightPositions(char[][] map, int width, int height, int currentX, int currentY) =>
+        [.. searchOffsets.Select(offset =>
         {
             var nextX = currentX + offset.X;
             var nextY = currentY + offset.Y;
@@ -55,11 +53,10 @@ public class Day10
                 return null;
             }
 
-            return map[nextY][nextX] == nextHeight
+            return map[nextY][nextX] == map[currentY][currentX] + 1
                 ? new Position(nextX, nextY)
                 : null;
         })];
-    }
 
     private static List<Position?> RecursePath(char[][] map, int width, int height, int currentX, int currentY)
     {
