@@ -7,5 +7,5 @@ var day10 = new Code.Day10();
 
 Console.WriteLine($"Part1 = {Code.Day10.Part1(input)}");
 
-// Console.WriteLine($"Part2 = {day10.Part2(input)}");
+Console.WriteLine($"Part2 = {Code.Day10.Part2(input)}");
 

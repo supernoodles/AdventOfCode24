@@ -2,9 +2,13 @@ namespace Code;
 
 public class Day10
 {
+    public static int Part1(string[] input) => FindTrailScore(input, true);
+
+    public static int Part2(string[] input) => FindTrailScore(input, false);
+
     private record Position(int X, int Y);
 
-    public static int Part1(string[] input)
+    public static int FindTrailScore(string[] input, bool distinct)
     {
         var width = input[0].Length;
         var height = input.Length;
@@ -22,7 +26,9 @@ public class Day10
                     continue;
                 }
 
-                score += RecursePath(map, width, height, col, row).Distinct().Count();
+                score += distinct
+                    ? RecursePath(map, width, height, col, row).Distinct().Count()
+                    : RecursePath(map, width, height, col, row).Count;
             }
         }
 
