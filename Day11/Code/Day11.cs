@@ -34,22 +34,17 @@ public class Day11
             sequence = nextSequence;
 
             ++count;
-
-            Console.WriteLine(count);
         } while (count < 25);
 
         return sequence.Count();
     }
 
-    public long Part2(string input)
-    {
-        Dictionary<(long, int), long> memo = [];
-        
-        IEnumerable<int> sequence = input.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(number => int.Parse(number));
-
-        return sequence.Select(number => Recurse(number, 75, memo)).Sum();
-    }
+    public long Part2(string input) =>
+        input.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(int.Parse)
+            .Select(number => Recurse(number, 75, []))
+            .Sum();
+    
 
     private long Recurse(long number, int steps, Dictionary<(long, int), long> memo)
     {
@@ -63,23 +58,15 @@ public class Day11
             return 1;
         }
 
-        var res = 0L;
-
         var numberAsString = $"{number}";
 
-        if (number == 0)
-        {
-            res = Recurse(1, steps - 1, memo);
-        }
-        else if (numberAsString.Length > 1 && numberAsString.Length % 2 == 0)
-        {
-            res = Recurse(int.Parse(numberAsString[..(numberAsString.Length / 2)]), steps - 1, memo)
-                + Recurse(int.Parse($"{long.Parse(numberAsString[(numberAsString.Length / 2)..])}"), steps - 1, memo);
-        }
-        else
-        {
-            res = Recurse(number * 2024L, steps - 1, memo);
-        }
+        long res =
+            number == 0
+                ? Recurse(1, steps - 1, memo)
+                : numberAsString.Length % 2 == 0
+                    ? Recurse(long.Parse(numberAsString[..(numberAsString.Length / 2)]), steps - 1, memo)
+                        + Recurse(long.Parse($"{long.Parse(numberAsString[(numberAsString.Length / 2)..])}"), steps - 1, memo)
+                    : Recurse(number * 2024L, steps - 1, memo);
 
         memo.Add((number, steps), res);
 
