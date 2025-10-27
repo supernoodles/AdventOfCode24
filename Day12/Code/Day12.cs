@@ -1,4 +1,5 @@
 
+
 namespace Code;
 
 public static class Day12
@@ -58,7 +59,65 @@ public static class Day12
 
     public static int Part2(string[] input)
     {
-        // Implementation for Part 2
+        char[][] map = [.. input.Select(line => line.ToCharArray())];
+
+        HashSet<(int, int)> visited = [];
+
+        var totalPrice = 0;
+
+        for (int row = 0; row < map.Length; row++)
+        {
+            for (int col = 0; col < map[0].Length; col++)
+            {
+                if (visited.Contains((row, col)))
+                {
+                    continue;
+                }
+
+                var area = 0;
+                var corners = 0;
+
+                var perim = RecurseCorners(map, visited, map[row][col], row, col, ref area, ref corners);
+
+                totalPrice += perim * area;
+            }
+        }
+
+        return totalPrice;
+    }
+
+    private static int RecurseCorners(char[][] map, HashSet<(int, int)> visited, char plant, int row, int col, ref int area, ref int corners)
+    {
+        if (visited.Contains((row, col)))
+        {
+            return 0;
+        }
+
+        visited.Add((row, col));
+        area += 1;
+
+        if ((!IsInBounds(map, row - 1, col) || map[row - 1][col] != plant) &&
+            (!IsInBounds(map, row, col - 1) || map[row][col - 1] != plant) &&
+            (!IsInBounds(map, row + 1, col) || map[row + 1][col] != plant))
+        {
+            corners += 2;
+
+            RecurseCorners(map, visited, plant, row, col + 1, ref area, ref corners);
+
+            return 0;
+        }
+
+        if ((!IsInBounds(map, row - 1, col) || map[row - 1][col] != plant) &&
+            (!IsInBounds(map, row, col + 1) || map[row][col + 1] != plant) &&
+            (!IsInBounds(map, row + 1, col) || map[row + 1][col] != plant))
+        {
+            corners += 2;
+
+            RecurseCorners(map, visited, plant, row, col - 1, ref area, ref corners);
+
+            return 0;
+        }
+
         return 0;
     }
 }

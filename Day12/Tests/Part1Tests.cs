@@ -33,7 +33,7 @@ OOOOO
         Assert.Equal(772, result);
     }
 
-[Fact]
+    [Fact]
     public void Test3()
     {
         var input = """
@@ -52,4 +52,5 @@ MMMISSJEEE
         var result = Code.Day12.Part1(input.Split(Environment.NewLine));
 
         Assert.Equal(1930, result);
-    }}
+    }
+}
