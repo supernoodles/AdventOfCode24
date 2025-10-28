@@ -77,47 +77,65 @@ public static class Day12
                 var area = 0;
                 var corners = 0;
 
-                var perim = RecurseCorners(map, visited, map[row][col], row, col, ref area, ref corners);
+                RecurseCorners(map, visited, map[row][col], row, col, ref area, ref corners);
 
-                totalPrice += perim * area;
+                totalPrice += corners * area;
             }
         }
 
         return totalPrice;
     }
 
-    private static int RecurseCorners(char[][] map, HashSet<(int, int)> visited, char plant, int row, int col, ref int area, ref int corners)
+    private static void RecurseCorners(char[][] map, HashSet<(int, int)> visited, char plant, int row, int col, ref int area, ref int corners)
     {
-        if (visited.Contains((row, col)))
+        if (!IsInBounds(map, row, col) || map[row][col] != plant)
         {
-            return 0;
+            return;
+        }
+
+        if (visited.Contains((row, col)) && map[row][col] == plant)
+        {
+            return;
         }
 
         visited.Add((row, col));
         area += 1;
 
-        if ((!IsInBounds(map, row - 1, col) || map[row - 1][col] != plant) &&
-            (!IsInBounds(map, row, col - 1) || map[row][col - 1] != plant) &&
-            (!IsInBounds(map, row + 1, col) || map[row + 1][col] != plant))
+        var (ldx, ldy) = (-1, 0);
+        var (tdx, tdy) = (0, -1);
+        var (ltdx, ltdy) = (-1, -1);
+
+        for (int turns = 0; turns < 4; ++turns)
         {
-            corners += 2;
+            if (
+                (!IsInBounds(map, row + ldy, col + ldx) || map[row + ldy][col + ldx] != plant) &&
+                (!IsInBounds(map, row + tdy, col + tdx) || map[row + tdy][col + tdx] != plant)
+            )
+            {
+                corners += 1;
+            }
 
-            RecurseCorners(map, visited, plant, row, col + 1, ref area, ref corners);
+            if (
+                IsInBounds(map, row + ldy, col + ldx) && map[row + ldy][col + ldx] == plant &&
+                IsInBounds(map, row + tdy, col + tdx) && map[row + tdy][col + tdx] == plant &&
+                IsInBounds(map, row + ltdy, col + ltdx) && map[row + ltdy][col + ltdx] != plant
+            )
+            {
+                corners += 1;
+            }
 
-            return 0;
+            (ldx, ldy) = Rotate90(ldx, ldy);
+            (tdx, tdy) = Rotate90(tdx, tdy);
+            (ltdx, ltdy) = Rotate90(ltdx, ltdy);
         }
-
-        if ((!IsInBounds(map, row - 1, col) || map[row - 1][col] != plant) &&
-            (!IsInBounds(map, row, col + 1) || map[row][col + 1] != plant) &&
-            (!IsInBounds(map, row + 1, col) || map[row + 1][col] != plant))
-        {
-            corners += 2;
-
-            RecurseCorners(map, visited, plant, row, col - 1, ref area, ref corners);
-
-            return 0;
-        }
-
-        return 0;
+        
+        RecurseCorners(map, visited, plant, row - 1, col, ref area, ref corners);
+        RecurseCorners(map, visited, plant, row, col + 1, ref area, ref corners);
+        RecurseCorners(map, visited, plant, row + 1, col, ref area, ref corners);
+        RecurseCorners(map, visited, plant, row, col - 1, ref area, ref corners);
     }
+    
+    private static (int x, int y) Rotate90(int x, int y) =>
+        (-y,
+        x);
 }
