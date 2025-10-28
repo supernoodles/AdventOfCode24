@@ -1,5 +1,3 @@
-
-
 namespace Code;
 
 public static class Day12
@@ -10,26 +8,22 @@ public static class Day12
 
         HashSet<(int, int)> visited = [];
 
-        var totalPrice = 0;
-
-        for (int row = 0; row < map.Length; row++)
-        {
-            for (int col = 0; col < map[0].Length; col++)
-            {
-                if (visited.Contains((row, col)))
+        return
+            map.SelectMany((row, ri) =>
+                row.Select((col, ci) =>
                 {
-                    continue;
-                }
+                    if (visited.Contains((ri, ci)))
+                    {
+                        return 0;
+                    }
 
-                var area = 0;
+                    var area = 0;
 
-                var perim = Recurse(map, visited, map[row][col], row, col, ref area);
+                    var perim = Recurse(map, visited, map[ri][ci], ri, ci, ref area);
 
-                totalPrice += perim * area;
-            }
-        }
-
-        return totalPrice;
+                    return perim * area;
+                }))
+            .Sum();
     }
 
     private static bool IsInBounds(char[][] map, int row, int col) =>
@@ -63,37 +57,30 @@ public static class Day12
 
         HashSet<(int, int)> visited = [];
 
-        var totalPrice = 0;
-
-        for (int row = 0; row < map.Length; row++)
-        {
-            for (int col = 0; col < map[0].Length; col++)
-            {
-                if (visited.Contains((row, col)))
+        return
+            map.SelectMany((row, ri) =>
+                row.Select((col, ci) =>
                 {
-                    continue;
-                }
+                    if (visited.Contains((ri, ci)))
+                    {
+                        return 0;
+                    }
 
-                var area = 0;
-                var corners = 0;
+                    var area = 0;
+                    var corners = 0;
 
-                RecurseCorners(map, visited, map[row][col], row, col, ref area, ref corners);
+                    RecurseCorners(map, visited, map[ri][ci], ri, ci, ref area, ref corners);
 
-                totalPrice += corners * area;
-            }
-        }
-
-        return totalPrice;
+                    return corners * area;
+                }))
+            .Sum();
     }
 
     private static void RecurseCorners(char[][] map, HashSet<(int, int)> visited, char plant, int row, int col, ref int area, ref int corners)
     {
-        if (!IsInBounds(map, row, col) || map[row][col] != plant)
-        {
-            return;
-        }
-
-        if (visited.Contains((row, col)) && map[row][col] == plant)
+        if (!IsInBounds(map, row, col) ||
+            map[row][col] != plant ||
+            (visited.Contains((row, col)) && map[row][col] == plant))
         {
             return;
         }
@@ -101,6 +88,7 @@ public static class Day12
         visited.Add((row, col));
         area += 1;
 
+        // Offsets for left, top and left-top cells (will be rotated!)
         var (ldx, ldy) = (-1, 0);
         var (tdx, tdy) = (0, -1);
         var (ltdx, ltdy) = (-1, -1);
@@ -112,6 +100,9 @@ public static class Day12
                 (!IsInBounds(map, row + tdy, col + tdx) || map[row + tdy][col + tdx] != plant)
             )
             {
+                // Convex corner
+                // ?B
+                // BA
                 corners += 1;
             }
 
@@ -121,14 +112,19 @@ public static class Day12
                 IsInBounds(map, row + ltdy, col + ltdx) && map[row + ltdy][col + ltdx] != plant
             )
             {
+                // Concave corner
+                // BA
+                // AA
                 corners += 1;
             }
 
+            // Rotate to check next diagonal for a corner
             (ldx, ldy) = Rotate90(ldx, ldy);
             (tdx, tdy) = Rotate90(tdx, tdy);
             (ltdx, ltdy) = Rotate90(ltdx, ltdy);
         }
         
+        // Flood fill to find the rest of the shape
         RecurseCorners(map, visited, plant, row - 1, col, ref area, ref corners);
         RecurseCorners(map, visited, plant, row, col + 1, ref area, ref corners);
         RecurseCorners(map, visited, plant, row + 1, col, ref area, ref corners);
