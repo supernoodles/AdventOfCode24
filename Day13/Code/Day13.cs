@@ -4,11 +4,22 @@ namespace Code;
 
 public partial class Day13
 {
+    public static long Part1(string[] input)
+    {
+        return FindMinTokens(input);
+    }
+
+    public static long Part2(string[] input)
+    {
+        return FindMinTokens(input, 10000000000000L);
+    }
+
+
     private static readonly Regex ButtonARegex = BARegex();
     private static readonly Regex ButtonBRegex = BBRegex();
     private static readonly Regex ButtonPRegex = PRegex();
 
-    public static long Part1(string[] input)
+    public static long FindMinTokens(string[] input, long offset = 0L)
     {
         var cost = 0L;
 
@@ -44,8 +55,8 @@ public partial class Day13
                 return 0;
             }
 
-            var pX = long.Parse(matchP.Groups["X"].Value);
-            var pY = long.Parse(matchP.Groups["Y"].Value);
+            var pX = long.Parse(matchP.Groups["X"].Value) + offset;
+            var pY = long.Parse(matchP.Groups["Y"].Value) + offset;
 
             if ((pX * bBY - pY * bBX) % (bAX * bBY - bBX * bAY) != 0)
             {
