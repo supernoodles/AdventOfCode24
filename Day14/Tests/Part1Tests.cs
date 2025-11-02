@@ -28,6 +28,6 @@ p=7,3 v=-1,2
 p=2,4 v=2,-3
 p=9,5 v=-3,-3
 """;
-        Assert.Equal(0, Code.Day14.Part1(input.Split(Environment.NewLine), 11, 7, 100));
+        Assert.Equal(12, Code.Day14.Part1(input.Split(Environment.NewLine), 11, 7, 100));
     }
 }

@@ -38,7 +38,12 @@ public partial class Day14
             }
         }
 
-        return 0;
+        var q1 = robots.Where(r => (r.PX < width / 2) && (r.PY < height / 2)).Count();
+        var q2 = robots.Where(r => (r.PX > width / 2) && (r.PY < height / 2)).Count();
+        var q3 = robots.Where(r => (r.PX < width / 2) && (r.PY > height / 2)).Count();
+        var q4 = robots.Where(r => (r.PX > width / 2) && (r.PY > height / 2)).Count();
+        
+        return q1 * q2 * q3 * q4;
     }
 
     [GeneratedRegex(@"^p=(?<px>\d*?),(?<py>\d*?) v=(?<vx>-?\d*?),(?<vy>-?\d*?)$")]
