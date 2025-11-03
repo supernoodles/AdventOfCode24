@@ -28,6 +28,16 @@ public class Day15
 
         var height = map.Count;
 
+        DisplayMap(map);
+
         return 0;
+    }
+
+    private static void DisplayMap(List<string> map)
+    {
+        foreach (var line in map)
+        {
+            Console.WriteLine(line);
+        }
     }
 }
