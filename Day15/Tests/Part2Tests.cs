@@ -16,13 +16,13 @@ public class Part2Tests
 
 <vv<<^^<<^^
 """;
-        Assert.Equal(0, Code.Day15.Part2(input.Split(Environment.NewLine)));
+        Assert.Equal(618, Code.Day15.Part2(input.Split(Environment.NewLine)));
     }
 
-    //[Fact]
-    public void Test2()
-    {
-        var input = """
+        [Fact]
+        public void Test2()
+        {
+            var input = """
 ##########
 #..O..O.O#
 #......O.#
@@ -45,6 +45,6 @@ vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
 ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
 v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 """;
-        Assert.Equal(9021, Code.Day15.Part2(input.Split(Environment.NewLine)));
-    }
+            Assert.Equal(9021, Code.Day15.Part2(input.Split(Environment.NewLine)));
+        }
 }

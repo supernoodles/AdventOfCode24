@@ -28,8 +28,6 @@ public class Day15
 
         foreach (var move in moves)
         {
-            //Console.WriteLine(move);
-
             var (dx, dy) = move switch
             {
                 '<' => (-1, 0),
@@ -43,8 +41,6 @@ public class Day15
             {
                 (x, y) = (x + dx, y + dy);
             }
-
-            //DisplayMap(map);
         }
 
         return map.Select((row, ri) =>
@@ -106,94 +102,94 @@ public class Day15
                 _ => throw new Exception("Bad")
             };
 
-            if (h && TryPushH(map, width, height, x, y, dx, dy))
+            if (h && TryPushPart1(map, width, height, x, y, dx, dy))
             {
                 x += dx;
             }
 
             if (v && CanPushV(map, width, height, x, y, dy))
             {
+                DoPushV(map, x, y, dy, []);
                 y += dy;
             }
-
-            DisplayMap(map);
         }
 
-        return 0;
+        return map.Select((row, ri) =>
+            row.Select((col, i) =>
+                col == '['
+                    ? ri * 100 + i
+                    : 0)
+                .Sum()
+            ).Sum();
     }
 
-    private static bool TryPushH(List<char[]> map, int width, int height, int x, int y, int dx, int dy)
-    {
-        if (x < 0 || x >= width || y < 0 || y >= height || map[y][x] == '#')
-        {
-            return false;
-        }
-
-        if (map[y][x] == '.')
-        {
-            return true;
-        }
-
-        var moveNext = TryPushH(map, width, height, x + dx, y + dy, dx, dy);
-
-        if (moveNext)
-        {
-            map[y + dy][x + dx] = map[y][x];
-            map[y][x] = '.';
-
-            return true;
-        }
-
-        return false;
-    }
+    private record Move(int X, int Y, int NX, int NY);
 
     private static bool CanPushV(List<char[]> map, int width, int height, int x, int y, int dy)
     {
-        if (x < 0 || x >= width || y < 0 || y >= height || map[y][x] == '#')
+        var nextY = y + dy;
+
+        if (y < 0 || y >= height || map[nextY][x] == '#')
         {
             return false;
         }
 
-        if (map[y][x] == '.')
+        if (map[nextY][x] == '.')
         {
             return true;
         }
 
-        var (ox, oy) = map[y][x] switch
+        var ox = map[nextY][x] switch
         {
-            '[' => (x + 1, y),
-            ']' => (x - 1, y),
+            '[' => x + 1,
+            ']' => x - 1,
             _ => throw new Exception("Bad")
         };
 
-        var moveNext = CanPushV(map, width, height, x, y + dy, dy) && CanPushV(map, width, height, ox, oy + dy, dy);
-
-        return moveNext;
-    }
-
-    private static bool TryPushV(List<char[]> map, int width, int height, int x, int y, int dx, int dy)
-    {
-        if (x < 0 || x >= width || y < 0 || y >= height || map[y][x] == '#')
+        if (CanPushV(map, width, height, x, nextY, dy) && CanPushV(map, width, height, ox, nextY, dy))
         {
-            return false;
-        }
-
-        if (map[y][x] == '.')
-        {
-            return true;
-        }
-
-        var moveNext = TryPushV(map, width, height, x + dx, y + dy, dx, dy);
-
-        if (moveNext)
-        {
-            map[y + dy][x + dx] = map[y][x];
-            map[y][x] = '.';
-
             return true;
         }
 
         return false;
+    }
+
+    private static void DoPushV(List<char[]> map, int x, int y, int dy, List<Move> moves, bool boxPair = false)
+    {
+        if (map[y][x] == '.')
+        {
+            return;
+        }
+
+        if (map[y][x] == '@')
+        {
+            DoPushV(map, x, y + dy, dy, moves);
+        }
+        else
+        {
+            var ox = map[y][x] switch
+            {
+                '[' => x + 1,
+                ']' => x - 1,
+                _ => throw new Exception("Bad")
+            };
+
+            if (!boxPair)
+            {
+                DoPushV(map, ox, y, dy, moves, boxPair: true);
+            }
+
+            DoPushV(map, x, y + dy, dy, moves);
+        }
+
+        var move = new Move(x, y, x, y + dy);
+
+        if (!moves.Contains(move))
+        {
+            moves.Add(move);
+            map[y + dy][x] = map[y][x];
+            map[y][x] = '.';
+        }
     }
 
     private static bool TryPushPart1(List<char[]> map, int width, int height, int x, int y, int dx, int dy)
@@ -223,8 +219,8 @@ public class Day15
 
     private static (int x, int y) FindGuard(List<char[]> map)
     {
-        var y = map.Index().Where(row => row.Item.Contains('@')).First().Index;
-        var x = map[y].Index().Where(col => col.Item.Equals('@')).First().Index;
+        var y = map.Index().First(row => row.Item.Contains('@')).Index;
+        var x = map[y].Index().First(col => col.Item.Equals('@')).Index;
 
         return (x, y);
     }
