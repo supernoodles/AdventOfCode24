@@ -80,8 +80,6 @@ public class Day15
             movements.Add(line);
         }
 
-        DisplayMap(map);
-
         var height = map.Count;
         var width = map[0].Length;
 
@@ -91,8 +89,6 @@ public class Day15
 
         foreach (var move in moves)
         {
-            Console.WriteLine(move);
-
             var (dx, dy, h, v) = move switch
             {
                 '<' => (-1, 0, true, false),
