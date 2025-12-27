@@ -10,70 +10,45 @@ public static class Day16
 
         var (dirX, dirY) = (1, 0);
 
-        var (shortest, path) = Recurse(maze, startX, startY, dirX, dirY, 0, []);
+        PriorityQueue<(int x, int y, int dx, int dy), int> queue = 
+            new();
 
-        foreach (var (vX, vY, vDirX, vDirY) in path)
+        HashSet<(int x, int y, int dx, int dy)> visited = 
+            [];
+
+        queue.Enqueue((startX, startY, dirX, dirY), 0);
+
+        var shortest = int.MaxValue;
+
+        while (queue.TryDequeue(out var item, out var score))
         {
-            if(maze[vY][vX] == 'S' || maze[vY][vX] == 'E')
+            var (x, y, dx, dy) = item;
+
+            if (maze[y][x] == 'E')
+            {
+                shortest = Math.Min(shortest, score);
+                continue;
+            }
+
+            if(visited.Contains((x, y, dx, dy)))
+            {
+                continue;
+            }
+
+            visited.Add((x, y, dx, dy));
+
+            if (maze[y][x] == '#')
                 continue;
 
-            maze[vY][vX] = (vDirX, vDirY) switch
-            {
-                (1, 0) => '>',
-                (0, 1) => 'v',
-                (-1, 0) => '<',
-                (0, -1) => '^',
-                _ => '?'
-            };
-        }
+            var dir90 = Rotate90(dx, dy);
+            var dirMinus90 = RotateMinus90(dx, dy);
 
-        PrintMap(maze);
+            queue.Enqueue((x + dx, y + dy, dx, dy), score + 1);
+            queue.Enqueue((x + dir90.x, y + dir90.y, dir90.x, dir90.y), score + 1001);
+            queue.Enqueue((x + dirMinus90.x, y + dirMinus90.y, dirMinus90.x, dirMinus90.y), score + 1001);
+        }
 
         return shortest;
-    }
-
-    private static readonly HashSet<(int x, int y, int dx, int dy)> _visited = [];
-
-    private static (int,HashSet<(int x, int y, int dx, int dy)>) 
-        Recurse(char[][] maze, int X, int Y, int dirX, int dirY, int score, HashSet<(int x, int y, int dx, int dy)> path)
-    {
-        if(path.Contains((X, Y, dirX, dirY)))
-        {
-            //Console.WriteLine($"Already visited {X},{Y}, skipping");
-            return (int.MaxValue, []);
-        }
-
-        path.Add((X, Y, dirX, dirY));
-
-        //Console.WriteLine($"Visiting {X},{Y} facing {dirX},{dirY} with score {score}");
-
-        if(maze[Y][X] == 'E')
-        {
-            return (score, path);
-        }
-
-        var dir90 = Rotate90(dirX, dirY);
-        var dirMinus90 = RotateMinus90(dirX, dirY);
-
-        var ahead = maze[Y + dirY][X + dirX];
-        var clockwise = maze[Y + dir90.y][X + dir90.x];
-        var anticlockwise = maze[Y + dirMinus90.y][X + dirMinus90.x];
-
-        if (ahead == '#' && clockwise == '#' && anticlockwise == '#')
-        {
-            return (int.MaxValue, []);
-        }
-
-        var scores = new (int, HashSet<(int x, int y, int dx, int dy)>)[] {
-            ahead != '#' ? Recurse(maze, X + dirX, Y + dirY, dirX, dirY, score + 1, [.. path]) : (int.MaxValue, []),
-            clockwise != '#' ? Recurse(maze, X + dir90.x, Y + dir90.y, dir90.x, dir90.y, score + 1001, [.. path]) : (int.MaxValue, []),
-            anticlockwise != '#' ? Recurse(maze, X + dirMinus90.x, Y + dirMinus90.y, dirMinus90.x, dirMinus90.y, score + 1001, [.. path]) : (int.MaxValue, [])
-        };
-
-        var minScore = scores.Min(item => item.Item1);
-        var minPath = scores.First(item => item.Item1 == minScore).Item2;
-
-        return (minScore, minPath);
     }
 
     public static int Part2(string[] input)
