@@ -10,11 +10,9 @@ public static class Day16
 
         var (dirX, dirY) = (1, 0);
 
-        PriorityQueue<(int x, int y, int dx, int dy), int> queue =
-            new();
+        PriorityQueue<(int x, int y, int dx, int dy), int> queue = new();
 
-        HashSet<(int x, int y, int dx, int dy)> visited =
-            [];
+        HashSet<(int x, int y, int dx, int dy)> visited = [];
 
         queue.Enqueue((startX, startY, dirX, dirY), 0);
 
@@ -51,12 +49,12 @@ public static class Day16
         return shortest;
     }
 
-    private record MazeState(int X, int Y, int Dx, int Dy);
-
-    private class Path(MazeState state, HashSet<MazeState> visited)
+    private readonly struct ReindeerState(int X, int Y, int Dx, int Dy)
     {
-        public MazeState State { get; } = state;
-        public HashSet<MazeState> Visited { get; } = visited;
+        public int X { get; } = X;
+        public int Y { get; } = Y;
+        public int Dx { get; } = Dx;
+        public int Dy { get; } = Dy;
     }
 
     public static int Part2(string[] input)
@@ -64,68 +62,63 @@ public static class Day16
         char[][] maze = [.. input.Select(line => line.ToCharArray())];
 
         var (startX, startY) = FindPos('S', maze);
+        var (endX, endY) = FindPos('E', maze);
 
-        Dictionary<MazeState, int> allVisited = [];
+        Dictionary<ReindeerState, int> allVisited = [];
 
-        PriorityQueue<Path, int> queue = new();
+        PriorityQueue<(ReindeerState, HashSet<ReindeerState>), int> queue = new();
 
-        var start = new MazeState(startX, startY, 1, 0);
+        var start = new ReindeerState(startX, startY, 1, 0);
 
-        queue.Enqueue(new Path(start, [start]), 0);
+        queue.Enqueue((start, [start]), 0);
 
         var shortest = int.MaxValue;
         
         HashSet<(int x, int y)> bestPathTiles = [];
 
-        while (queue.TryDequeue(out var path, out var score))
+        while (queue.TryDequeue(out var state, out var score))
         {
             if (score > shortest)
             {
                 continue;
             }
 
-            var current = path.State;
-            var visited = path.Visited;
+            var (current, path) = state;
 
-            if (maze[current.Y][current.X] == 'E')
+            if (current.Y == endY && current.X == endX)
             {
                 if (score < shortest)
                 {
-                    bestPathTiles = [.. path.Visited.Select(state => (state.X, state.Y))];
-                    shortest = score; ;
+                    bestPathTiles = [.. path.Select(state => (state.X, state.Y))];
+                    shortest = score;
                     continue;
                 }
 
-                bestPathTiles.UnionWith(path.Visited.Select(state => (state.X, state.Y)));
+                bestPathTiles.UnionWith(path.Select(state => (state.X, state.Y)));
 
                 continue;
             }
 
-            if (!CanVisitTile(allVisited, current, score))
-            {
-                continue;
-            }
+            path.Add(current);
 
-            visited.Add(current);
-
-            var nextState = new MazeState(current.X + current.Dx, current.Y + current.Dy, current.Dx, current.Dy);
+            var nextState = new ReindeerState(current.X + current.Dx, current.Y + current.Dy, current.Dx, current.Dy);
             if (IsValidTile(maze, nextState.X, nextState.Y) && CanVisitTile(allVisited, nextState, score + 1))
             {
-                queue.Enqueue(new Path(nextState, [.. visited]), score + 1);
+                queue.Enqueue((nextState, [.. path]), score + 1);
             }
 
             var dir90 = Rotate90(current.Dx, current.Dy);
-            var dir90State = new MazeState(current.X, current.Y, dir90.x, dir90.y);
+            var dir90State = new ReindeerState(current.X, current.Y, dir90.x, dir90.y);
             if (CanVisitTile(allVisited, dir90State, score + 1000))
             {
-                queue.Enqueue(new Path(dir90State, [.. visited]), score + 1000);
+                queue.Enqueue((dir90State, [.. path]), score + 1000);
             }
 
             var dirMinus90 = RotateMinus90(current.Dx, current.Dy);
-            var dirMinus90State = new MazeState(current.X, current.Y, dirMinus90.x, dirMinus90.y);
+            var dirMinus90State = new ReindeerState(current.X, current.Y, dirMinus90.x, dirMinus90.y);
             if (CanVisitTile(allVisited, dirMinus90State, score + 1000))
             {
-                queue.Enqueue(new Path(dirMinus90State, [.. visited]), score + 1000);
+                queue.Enqueue((dirMinus90State, [.. path]), score + 1000);
             }
         }
 
@@ -152,8 +145,8 @@ public static class Day16
         maze[y][x] == '.' || maze[y][x] == 'E';
 
     private static bool CanVisitTile(
-        Dictionary<MazeState, int> allVisited,
-        MazeState state,
+        Dictionary<ReindeerState, int> allVisited,
+        ReindeerState state,
         int score)
     {
         if (allVisited.TryGetValue(state, out var existingScore) && existingScore != score)
