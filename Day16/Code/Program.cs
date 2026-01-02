@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, Day15!");
+Console.WriteLine("Hello, Day16!");
 
 // var input2 = """
 // ######
