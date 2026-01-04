@@ -2,15 +2,15 @@ namespace Code;
 
 public class Computer
 {
-    public int RegisterA { get; set; }
-    public int RegisterB { get; set; }
-    public int RegisterC { get; set; }
+    public long RegisterA { get; set; }
+    public long RegisterB { get; set; }
+    public long RegisterC { get; set; }
 
     public int[]? Program { get; set; }
 
-    private int _pc = 0;
+    private long _pc = 0;
 
-    private readonly List<int> _output = [];
+    private readonly List<long> _output = [];
 
     public string Run()
     {
@@ -45,7 +45,7 @@ public class Computer
         return string.Join(",", _output);
     }
 
-    private int DecodeOperand(int operand) =>
+    private long DecodeOperand(int operand) =>
         operand switch
         {
             <= 3 => operand,
@@ -57,7 +57,7 @@ public class Computer
         };
 
     private void Adv(int operand) => 
-        RegisterA = (int)Math.Floor(RegisterA / Math.Pow(2, DecodeOperand(operand)));
+        RegisterA = (long)Math.Floor(RegisterA / Math.Pow(2, DecodeOperand(operand)));
 
     private void Bxl(int operand) =>
         RegisterB ^= operand;
@@ -80,8 +80,8 @@ public class Computer
         _output.Add(DecodeOperand(operand) % 8);
 
     private void Bdv(int operand) =>
-        RegisterB = (int)Math.Floor(RegisterA / Math.Pow(2, DecodeOperand(operand)));
+        RegisterB = (long)Math.Floor(RegisterA / Math.Pow(2, DecodeOperand(operand)));
 
     private void Cdv(int operand) =>
-        RegisterC = (int)Math.Floor(RegisterA / Math.Pow(2, DecodeOperand(operand)));
+        RegisterC = (long)Math.Floor(RegisterA / Math.Pow(2, DecodeOperand(operand)));
 }
